@@ -3,6 +3,7 @@ import json
 import pickle
 from datetime import datetime
 import re
+from .browser_runtime import create_chrome_webdriver
 
 # 存储目录和文件
 STEAM_AUTH_DIR = "./data/plugins/astrbot_plugin_steamshot/auth"
@@ -549,28 +550,16 @@ def verify_steam_login(driver, domain_type="store"):
 
 async def test_steam_login():
     """测试Steam登录状态"""
-    from selenium import webdriver
-    from selenium.webdriver.chrome.options import Options
-    from selenium.webdriver.chrome.service import Service
-    from webdriver_manager.chrome import ChromeDriverManager
-    
     store_driver = None
     community_driver = None
     try:
-        options = Options()
-        options.add_argument("--headless")
-        options.add_argument("--disable-gpu")
-        options.add_argument("--no-sandbox")
-        
-        service = Service(ChromeDriverManager().install())
-        
         # 测试商店登录
-        store_driver = webdriver.Chrome(service=service, options=options)
+        store_driver = create_chrome_webdriver()
         store_success = apply_cookies_to_driver(store_driver, "https://store.steampowered.com")
         store_status, store_username = verify_steam_login(store_driver, "store")
         
         # 测试社区登录 - 使用新的driver实例
-        community_driver = webdriver.Chrome(service=service, options=options)
+        community_driver = create_chrome_webdriver()
         community_success = apply_cookies_to_driver(community_driver, "https://steamcommunity.com")
         community_status, community_username = verify_steam_login(community_driver, "community")
         
